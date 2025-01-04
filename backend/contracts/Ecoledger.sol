@@ -155,10 +155,7 @@ ISustainabilityCoin public  sustainabilityToken;
         ); 
     }
 
-    function getAllRegisteredProjects() public view returns(CarbonProject[] memory) {
-        return carbonProjects;
-   
-   }   
+
    
     function insurance(uint256 id) public payable { 
         require(isRegistered[id],"his project ID is not registered");
@@ -348,6 +345,11 @@ function getTotalInsurancePayments() external view returns (uint256) {
     }
     return totalInsurance;
 }
+
+function getAllRegisteredProjects() public view returns(CarbonProject[] memory) {
+    return carbonProjects;
+
+}   
 
    }
 
