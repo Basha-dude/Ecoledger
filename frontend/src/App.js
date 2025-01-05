@@ -16,6 +16,7 @@ const App = () => {
     emissionsReductionProject:false
 
   })
+const [projects, setProjects] = useState([])
 
 
   const connectingWallet = async () => {
@@ -30,9 +31,7 @@ const App = () => {
         const signer = await provider.getSigner()
         const contractInstance = new ethers.Contract(EcoLedgerAdress,EcoLedgerAbi,signer)
         setContract(contractInstance)
-        console.log("Contract :", contract);
-        console.log("Contract Instance:", contractInstance);
-        console.log("Signer:", signer);
+       
 
 
       } else {
@@ -48,6 +47,12 @@ const App = () => {
   }
 
   const handleSubmit = async() => {
+    
+    /* 
+     ikkada setContract synchronus process kabatti late avvuddi,
+      so andukey if(!contract) use chesindi
+    */
+    
     try {
       if (!contract) {
         alert("Connect your wallet first!");
@@ -75,17 +80,21 @@ const App = () => {
         alert("Project registered successfully!")
 
       }
-       
+      const getAllRegisteredProjectIds = await contract.getAllRegisteredProjectIds()
+      console.log("getAllRegisteredProjectIds",getAllRegisteredProjectIds);
       console.log("Form submitted:", projectDetails);
+      
+         
       setProjectDetails({
         name:"",
         annualemissions:"",
         annualWaterusage:"",
         emissionsReductionProject: false
       })
-   
-      
-    } catch (error) {
+    }
+    
+
+    catch (error) {
       console.error("Error registering project:", error)
       alert("Error registering project: " + error.message)  
     }
@@ -123,7 +132,7 @@ const App = () => {
       <label>Liters: </label>
       <input type="number"  value={projectDetails.annualWaterusage} onChange={(e)=> setProjectDetails({...projectDetails, annualWaterusage:e.target.value})}/>
       <br />
-      <input type="checkbox" value={projectDetails.emissionsReductionProject} onChange={(e)=> setProjectDetails({...projectDetails, emissionsReductionProject: e.target.value})}/>  
+      <input type="checkbox" value={projectDetails.emissionsReductionProject} onChange={(e)=> setProjectDetails({...projectDetails, emissionsReductionProject: e.target.checked})}/>  
       <br />
       <button onClick={handleSubmit}>Register project</button>
       <br />

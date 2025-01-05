@@ -346,10 +346,36 @@ function getTotalInsurancePayments() external view returns (uint256) {
     return totalInsurance;
 }
 
-function getAllRegisteredProjects() public view returns(CarbonProject[] memory) {
-    return carbonProjects;
+function getAllRegisteredProjects() public view returns (
+    uint256[] memory ids,
+    string[] memory names,
+    uint256[] memory annualEmissions,
+    uint256[] memory annualWaterUsages,
+    bool[] memory emissionsReductionProjects,
+    bool[] memory validatedStatuses,
+    bool[] memory paidStatuses
+) {
+    uint256 projectCount = carbonProjects.length;
+    ids = new uint256[](projectCount);
+    names = new string[](projectCount);
+    annualEmissions = new uint256[](projectCount);
+    annualWaterUsages = new uint256[](projectCount);
+    emissionsReductionProjects = new bool[](projectCount);
+    validatedStatuses = new bool[](projectCount);
+    paidStatuses = new bool[](projectCount);
 
-}   
+    for (uint256 i = 0; i < projectCount; i++) {
+        CarbonProject storage project = carbonProjects[i];
+        ids[i] = project.id;
+        names[i] = project.name;
+        annualEmissions[i] = project.Annualemissions;
+        annualWaterUsages[i] = project.AnnualWaterusage;
+        emissionsReductionProjects[i] = project.EmissionsReductionProject;
+        validatedStatuses[i] = project.Validated;
+        paidStatuses[i] = project.Paid;
+    }
+}
+
 
    }
 
