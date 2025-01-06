@@ -21,6 +21,6 @@ module.exports = {
     sources: "./contracts",  // Adjust the path to your contracts folder if necessary
     tests: "./test",
     cache: "./cache",
-    artifacts: "./artifacts",
+    artifacts:"../frontend/src/abi",
   },
 };

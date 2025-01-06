@@ -88,11 +88,11 @@ ISustainabilityCoin public  sustainabilityToken;
         require(!isRegistered[projectId + 1], "This project ID is already registered.");
 
       
-        projectId++;
+        totalProjects++;
         
 
         CarbonProject memory newProject = CarbonProject({
-            id: projectId, 
+            id: totalProjects, 
             name: name,
             Annualemissions: annualemissions,
             AnnualWaterusage: annualWaterusage,
@@ -346,37 +346,57 @@ function getTotalInsurancePayments() external view returns (uint256) {
     return totalInsurance;
 }
 
-function getAllRegisteredProjects() public view returns (
-    uint256[] memory ids,
-    string[] memory names,
-    uint256[] memory annualEmissions,
-    uint256[] memory annualWaterUsages,
-    bool[] memory emissionsReductionProjects,
-    bool[] memory validatedStatuses,
-    bool[] memory paidStatuses
-) {
-    uint256 projectCount = carbonProjects.length;
-    ids = new uint256[](projectCount);
-    names = new string[](projectCount);
-    annualEmissions = new uint256[](projectCount);
-    annualWaterUsages = new uint256[](projectCount);
-    emissionsReductionProjects = new bool[](projectCount);
-    validatedStatuses = new bool[](projectCount);
-    paidStatuses = new bool[](projectCount);
+// function getAllRegisteredProjects() public view returns (
+//     uint256[] memory ids,
+//     string[] memory names,
+//     uint256[] memory annualEmissions,
+//     uint256[] memory annualWaterUsages,
+//     bool[] memory emissionsReductionProjects,
+//     bool[] memory validatedStatuses,
+//     bool[] memory paidStatuses
+// ) {
+//     uint256 projectCount = carbonProjects.length;
+//     ids = new uint256[](projectCount);
+//     names = new string[](projectCount);
+//     annualEmissions = new uint256[](projectCount);
+//     annualWaterUsages = new uint256[](projectCount);
+//     emissionsReductionProjects = new bool[](projectCount);
+//     validatedStatuses = new bool[](projectCount);
+//     paidStatuses = new bool[](projectCount);
 
-    for (uint256 i = 0; i < projectCount; i++) {
-        CarbonProject storage project = carbonProjects[i];
-        ids[i] = project.id;
-        names[i] = project.name;
-        annualEmissions[i] = project.Annualemissions;
-        annualWaterUsages[i] = project.AnnualWaterusage;
-        emissionsReductionProjects[i] = project.EmissionsReductionProject;
-        validatedStatuses[i] = project.Validated;
-        paidStatuses[i] = project.Paid;
-    }
+//     for (uint256 i = 0; i < projectCount; i++) {
+//         CarbonProject storage project = carbonProjects[i];
+//         ids[i] = project.id;
+//         names[i] = project.name;
+//         annualEmissions[i] = project.Annualemissions;
+//         annualWaterUsages[i] = project.AnnualWaterusage;
+//         emissionsReductionProjects[i] = project.EmissionsReductionProject;
+//         validatedStatuses[i] = project.Validated;
+//         paidStatuses[i] = project.Paid;
+//     }
+// }
+
+// function getAllRegisteredProjects() public view returns(CarbonProject[] memory) {
+//     return carbonProjects;
+    
+// }
+
+// function getAllRegisteredProjects() public view returns(CarbonProject[] memory) {
+//     CarbonProject[] memory projectsArray = new CarbonProject[](totalProjects);
+//     for(uint i = 0; i < totalProjects; i++) {
+//         projectsArray[i] = idToProject[i + 1]; // Note: +1 because projectId starts from 1
+//     }
+//     return projectsArray;
+// }
+
+function getAllRegisteredProjects() external view returns(CarbonProject[] memory) {
+    // Create a new array with the exact size needed
+             return carbonProjects;
 }
-
-
+function getcarbonProjectsLength() external view returns(uint256) {
+    // Create a new array with the exact size needed
+             return carbonProjects.length;  
+}
    }
 
 

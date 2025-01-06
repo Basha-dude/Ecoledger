@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import abi from "./abi/EcoLedger.json"
+import abi from "../src/abi/contracts/Ecoledger.sol/EcoLedger.json"
 import { ethers } from "ethers";
 
 
 const App = () => {
 
   const EcoLedgerAbi = abi.abi
-  const EcoLedgerAdress ="0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+  const EcoLedgerAdress ="0xc5a5C42992dECbae36851359345FE25997F5C42d"
   const [walletAccount, setwalletAccount] = useState("")
  const [contract, setContract] = useState(null)
   const [projectDetails, setProjectDetails] = useState({
@@ -16,6 +16,7 @@ const App = () => {
     emissionsReductionProject:false
 
   })
+  let contractInstance
 const [projects, setProjects] = useState([])
 
 
@@ -29,7 +30,7 @@ const [projects, setProjects] = useState([])
         //setup contract instance
         const provider  = new ethers.BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
-        const contractInstance = new ethers.Contract(EcoLedgerAdress,EcoLedgerAbi,signer)
+         contractInstance = new ethers.Contract(EcoLedgerAdress,EcoLedgerAbi,signer)
         setContract(contractInstance)
        
 
@@ -80,20 +81,26 @@ const [projects, setProjects] = useState([])
         alert("Project registered successfully!")
 
       }
-      const getAllRegisteredProjectIds = await contract.getAllRegisteredProjectIds()
-      console.log("getAllRegisteredProjectIds",getAllRegisteredProjectIds);
-      console.log("Form submitted:", projectDetails);
+    
       
-         
       setProjectDetails({
         name:"",
         annualemissions:"",
         annualWaterusage:"",
         emissionsReductionProject: false
       })
+        
+      
+      
+      const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
+      console.log("getAllRegisteredProjects",getAllRegisteredProjects);
+
+      const getcarbonProjectsLength = await contract.getcarbonProjectsLength()
+      console.log("getcarbonProjectsLength",getcarbonProjectsLength);
+
+        
     }
     
-
     catch (error) {
       console.error("Error registering project:", error)
       alert("Error registering project: " + error.message)  
@@ -132,7 +139,15 @@ const [projects, setProjects] = useState([])
       <label>Liters: </label>
       <input type="number"  value={projectDetails.annualWaterusage} onChange={(e)=> setProjectDetails({...projectDetails, annualWaterusage:e.target.value})}/>
       <br />
-      <input type="checkbox" value={projectDetails.emissionsReductionProject} onChange={(e)=> setProjectDetails({...projectDetails, emissionsReductionProject: e.target.checked})}/>  
+      <label>
+  <input 
+    type="checkbox" 
+    checked={projectDetails.emissionsReductionProject} 
+    onChange={(e) => setProjectDetails({...projectDetails, emissionsReductionProject: e.target.checked})} 
+  />
+  Emissions Reduction Project
+</label>
+
       <br />
       <button onClick={handleSubmit}>Register project</button>
       <br />
