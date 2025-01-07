@@ -103,7 +103,6 @@ ISustainabilityCoin public  sustainabilityToken;
             carbonProjects.push(newProject);
             isRegistered[projectId] = true;
             idToProject[projectId] = newProject;
-            totalProjects++;
 
           emit CarbonProjectEvent(name, annualemissions, annualWaterusage, emissionsReductionProject, false);
     }

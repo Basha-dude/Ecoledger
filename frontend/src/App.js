@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 const App = () => {
 
   const EcoLedgerAbi = abi.abi
-  const EcoLedgerAdress ="0xc5a5C42992dECbae36851359345FE25997F5C42d"
+  const EcoLedgerAdress ="0x4A679253410272dd5232B3Ff7cF5dbB88f295319"
   const [walletAccount, setwalletAccount] = useState("")
  const [contract, setContract] = useState(null)
   const [projectDetails, setProjectDetails] = useState({
@@ -16,7 +16,6 @@ const App = () => {
     emissionsReductionProject:false
 
   })
-  let contractInstance
 const [projects, setProjects] = useState([])
 
 
@@ -30,7 +29,7 @@ const [projects, setProjects] = useState([])
         //setup contract instance
         const provider  = new ethers.BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
-         contractInstance = new ethers.Contract(EcoLedgerAdress,EcoLedgerAbi,signer)
+       const  contractInstance = new ethers.Contract(EcoLedgerAdress,EcoLedgerAbi,signer)
         setContract(contractInstance)
        
 
@@ -90,23 +89,28 @@ const [projects, setProjects] = useState([])
         emissionsReductionProject: false
       })
         
-      
-      
-      const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
-      console.log("getAllRegisteredProjects",getAllRegisteredProjects);
-
-      const getcarbonProjectsLength = await contract.getcarbonProjectsLength()
-      console.log("getcarbonProjectsLength",getcarbonProjectsLength);
-
-        
     }
     
     catch (error) {
       console.error("Error registering project:", error)
       alert("Error registering project: " + error.message)  
-    }
+    }   
+  }
 
-   
+  const fetchProjects = async () => {
+    try {
+      console.log("Getting Registered Projects");
+    
+     
+      const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
+      if (getAllRegisteredProjects) {
+        setProjects(getAllRegisteredProjects)
+        console.log("projects from contract:", getAllRegisteredProjects);
+      }
+
+    } catch (error) {
+      console.error("Error fetching Projects :",error); 
+    }
   }
 
   useEffect(() => {
@@ -144,6 +148,7 @@ const [projects, setProjects] = useState([])
     type="checkbox" 
     checked={projectDetails.emissionsReductionProject} 
     onChange={(e) => setProjectDetails({...projectDetails, emissionsReductionProject: e.target.checked})} 
+    onKeyDown={(e) => setProjectDetails({...projectDetails,emissionsReductionProject:!projectDetails.emissionsReductionProject})}
   />
   Emissions Reduction Project
 </label>
@@ -152,7 +157,24 @@ const [projects, setProjects] = useState([])
       <button onClick={handleSubmit}>Register project</button>
       <br />
 
-      <h2>projectDetails</h2>
+      <br />
+      <button onClick={fetchProjects}>Get Registered Projects</button>
+      <br />
+
+      <h2>Registered Project Details</h2>
+      <>
+      {projects.length > 0 ? projects.map((project) => (
+   <div key={project[1]}>  {/* using the name (at index 1) as key */}
+    <p>Project ID:{project[0]}</p>
+    <p>{project[1]}</p>  {/* name is at index 1 */}
+    <p>Annual Emissions: {project[2].toString()} Tons</p> {/* emissions at index 2 */}
+    <p>Annual Waterusage:{project[3].toString()} Liters</p>
+    <p>Validated:{project[4].toString()}</p>
+    <br />
+  </div>
+)) : "No Registered Projects"}
+            
+      </>
     </div>
     
   )
