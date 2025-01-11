@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const { ethers, upgrades } = require("hardhat");
 
 async function main() {
@@ -38,6 +40,24 @@ async function main() {
     console.log("Deployment completed successfully!");
     console.log(`SustainabilityCoin Address: ${sustainabilityCoinAddress}`);
     console.log(`EcoLedger Proxy Address: ${ecoLedgerAddress}`);
+
+    // Prepare the deployment data
+    const deploymentData = {
+        sustainabilityCoinAddress: sustainabilityCoinAddress,
+        ecoLedgerAddress: ecoLedgerAddress,
+    };
+
+    // Define the path to the frontend src/abi folder
+    const dirPath = path.join(__dirname, "..", "..", "frontend", "src", "abi");
+    
+    // Create the directory if it doesn't exist
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // Write the deployment data to a JSON file
+    fs.writeFileSync(path.join(dirPath, "deployment-config.json"), JSON.stringify(deploymentData, null, 2));
+    console.log("Deployment configuration saved to frontend/src/abi/deployment-config.json");
 }
 
 main()
@@ -45,4 +65,4 @@ main()
     .catch((error) => {
         console.error("Error in deployment:", error);
         process.exit(1);
-    }); 
+    });

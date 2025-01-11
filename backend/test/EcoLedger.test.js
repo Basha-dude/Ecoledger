@@ -144,12 +144,16 @@ describe("PAY FOR CARBON + VALIDATED PROJECT FUNCTION", function () {
 
   beforeEach(async function () {
     await ecoLedger.registerProject(DEFAULT_CARBON_PROJECT_NAME,MAX_ANNUAL_EMISSIONS,MAX_ANNUAL_WATER_USAGE,true)
-    await ecoLedger.validateRegisteredProject(1)
+    const id = await ecoLedger.totalProjects();
+      console.log("id",id);
+    await ecoLedger.validateRegisteredProject(id)
    
     });
 
     it("should VALIDATE", async function () {
-      const id = await ecoLedger.projectId();
+      const id = await ecoLedger.totalProjects();
+      console.log("",id);
+      
       const project = await ecoLedger.getFullCarbonProject(id); 
       const validate =await  ecoLedger.isProjectValidated(id); // Exceeds the maximum
        expect(validate).to.equal(true)

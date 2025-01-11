@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 import {ISustainabilityCoin} from "./interfaces/ISustainabilityCoin.sol";    
 import {UUPSUpgradeable,Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -85,14 +85,17 @@ ISustainabilityCoin public  sustainabilityToken;
         require(annualemissions < 10000, "Annual emissions must be less than 10,000 tons.");
         require(annualWaterusage < 100000, "Annual water usage must not exceed 100,000 liters.");
         require(emissionsReductionProject, "Project must include emissions reduction.");
-        require(!isRegistered[projectId + 1], "This project ID is already registered.");
+        require(!isRegistered[projectId + 1], "registerProject:- This project ID is already registered.");
 
-      
         totalProjects++;
+        projectId = totalProjects; 
+        console.log("projectId",projectId);
+      
+       
         
 
         CarbonProject memory newProject = CarbonProject({
-            id: totalProjects, 
+            id: projectId, 
             name: name,
             Annualemissions: annualemissions,
             AnnualWaterusage: annualWaterusage,
@@ -141,9 +144,27 @@ ISustainabilityCoin public  sustainabilityToken;
         require(isRegistered[id],"his project ID is not registered");
         require(!idToProject[id].Paid, "This project is already Paid");
         CarbonProject storage carbonProject = idToProject[id];
+
          
         require(!carbonProject.Validated, "This project is already validated");
         carbonProject.Validated = true;
+
+        // for (uint i = 1; i <= carbonProjects.length; i++) {
+        //     if(carbonProjects[i].id == id) {
+        //         carbonProjects[i].Validated = true;
+        //         break;
+        //     }   
+        // } 
+
+        for (uint i = 0; i < carbonProjects.length; i++) {
+            if (carbonProjects[i].id == id) {
+                carbonProjects[i].Validated = true;
+                break;
+            }
+        }
+        
+
+
 
         emit CarbonProjectEvent(
             carbonProject.name,
