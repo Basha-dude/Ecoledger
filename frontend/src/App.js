@@ -9,8 +9,10 @@ const App = () => {
   const { sustainabilityCoinAddress, ecoLedgerAddress } = deploymentConfig;
   const EcoLedgerAbi = abi.abi
   const EcoLedgerAdress = ecoLedgerAddress
+  const [validatedProjects, setValidatedProjects] = useState([])
   const [walletAccount, setwalletAccount] = useState("")
  const [contract, setContract] = useState(null)
+ const [notValidatedProjects, setNotValidatedProjects] = useState([])
   const [projectDetails, setProjectDetails] = useState({
     name:"",
     annualemissions:"",
@@ -42,8 +44,13 @@ const [projects, setProjects] = useState([])
       }
   }
 
+  /* 
+   @params: eee accounts ,  @event window.ethereum.on("accountsChanged",handleChange)
+                              nunchi vasthadhi
+
+  */
   const handleChange = async(accounts) => {
-    if (accounts > 0) {
+    if (accounts.length > 0) {
     setwalletAccount(accounts[0])
     }
   }
@@ -51,7 +58,7 @@ const [projects, setProjects] = useState([])
   const handleSubmit = async() => {
     
     /* 
-     ikkada setContract synchronus process kabatti late avvuddi,
+     ikkada setContract state update late avvuddi  process kabatti ,
       so andukey if(!contract) use chesindi
     */
     
@@ -101,7 +108,7 @@ const [projects, setProjects] = useState([])
 
   const fetchProjects = async () => {
     if (!walletAccount) {
-       alert("get connect wallet")
+      alert("connect wallet to Registered projects")
        return
     }
     try {
@@ -110,7 +117,10 @@ const [projects, setProjects] = useState([])
      
       const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
       console.log("Fetched Projects IDs:", getAllRegisteredProjects.map(project => project[0]));
-         console.log("projects from contract:", getAllRegisteredProjects);
+      console.log("projects from contract:", getAllRegisteredProjects);
+
+      
+
 
       
       setProjects(getAllRegisteredProjects)
@@ -129,12 +139,16 @@ const [projects, setProjects] = useState([])
     try {
       const idToValidate = id.toString(); // Convert to string
 
-      const validateTx = await contract.validateRegisteredProject(idToValidate, {
-        gasLimit: ethers.parseUnits('500000', 'wei'), // Adjust dynamically
-      });
+      const validateTx = await contract.validateRegisteredProject(idToValidate);
 
       await validateTx.wait();
+    
       alert("Project validated");
+     
+        // Fetch the updated list of registered projects
+      await fetchProjects();
+      await fetchValidatedProjects()
+      await fetchNotValidatedProjects()      
     } catch (error) {
       console.error("Error validating project:", error);
       if (error.message.includes("project ID is not registered")) {
@@ -144,6 +158,43 @@ const [projects, setProjects] = useState([])
       }
     }
   }
+
+  const fetchValidatedProjects = async() => {
+    if (!walletAccount) {
+      alert("connect wallet to Validated projects")
+      return
+    }
+      try {
+         const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
+         const Vprojects = getAllRegisteredProjects.filter(project => project[5] === true )
+        setValidatedProjects(Vprojects)
+      console.log("Vprojects",Vprojects);
+
+      } catch (error) {
+        console.log("error from fetchValidate",error);
+        
+    }
+    
+  }
+
+  const fetchNotValidatedProjects = async() => {
+    console.log("fetchNotValidatedProjects");
+    try {
+      const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
+      const notAllValidatedProjects =  getAllRegisteredProjects.filter(project => project[5] === false)
+      console.log("notAllValidatedProjects",notAllValidatedProjects);
+      
+      setNotValidatedProjects(notAllValidatedProjects)
+    } catch (error) {
+      console.log("from not validated",error);
+      
+    }
+  
+    
+  }
+
+
+  
 
   useEffect(() => {
     if (window.ethereum) {
@@ -191,6 +242,10 @@ const [projects, setProjects] = useState([])
 
       <br />
       <button onClick={fetchProjects}>Get Registered Projects</button>
+      <button onClick={fetchValidatedProjects}> VALIDATED PROJECTS</button>
+      <button onClick={fetchNotValidatedProjects}> NEED VALIDATED PROJECTS</button>
+
+
       <br />
 
       <h2>Registered Project Details</h2>
@@ -202,16 +257,55 @@ const [projects, setProjects] = useState([])
     <p>Annual Emissions: {project[2].toString()} Tons</p> {/* emissions at index 2 */}
     <p>Annual Waterusage:{project[3].toString()} Liters</p>
     <p>Validated:{project[5].toString()}</p>
-    <button onClick={() => ValidateTheRegister(project[0])}>Validate</button>
+    {project[5] ? "" : <button onClick={() => ValidateTheRegister(project[0])}>Validate</button> }
+    
     <br />
     <br />
     <br />
     <br />
+   
   </div>
-)) : "No Registered Projects"}
-            
+)) : "No Registered Projects"} 
       </>
+    <br />
+    <br />
+    <br />
+   <h2>Validated Projects</h2>
+     <>
+      {validatedProjects.length > 0 ? validatedProjects.map((vproject) =>(
+
+        <div key={vproject[0]}>
+        <p>Project ID:{vproject[0]}</p>
+    <p>{vproject[1]}</p>  {/* name is at index 1 */}
+    <p>Annual Emissions: {vproject[2].toString()} Tons</p> {/* emissions at index 2 */}
+    <p>Annual Waterusage:{vproject[3].toString()} Liters</p>
+    <p>Validated:{vproject[5].toString()}</p>
+    <br />
+    <br />
+    <br />
+        </div>
+
+      )) :"No Validated  Projects"}
+      </>
+         
+    <br />
+    <br />
+    <br />
+      <h2>Need To Validated Projects</h2>
+      <>
+      {notValidatedProjects.length >0 ? notValidatedProjects.map((NVproject) => (
+        <div key={NVproject[0]}>
+       <p>ID FROM NOT{NVproject[0]}</p>
+     </div>
+      )) 
+
+        :"All ProjectsValidated "}
+        </>
+
     </div>
+
+    
+ 
     
   )
 }

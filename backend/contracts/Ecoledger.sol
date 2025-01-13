@@ -149,13 +149,6 @@ ISustainabilityCoin public  sustainabilityToken;
         require(!carbonProject.Validated, "This project is already validated");
         carbonProject.Validated = true;
 
-        // for (uint i = 1; i <= carbonProjects.length; i++) {
-        //     if(carbonProjects[i].id == id) {
-        //         carbonProjects[i].Validated = true;
-        //         break;
-        //     }   
-        // } 
-
         for (uint i = 0; i < carbonProjects.length; i++) {
             if (carbonProjects[i].id == id) {
                 carbonProjects[i].Validated = true;
