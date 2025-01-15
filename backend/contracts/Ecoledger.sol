@@ -8,8 +8,6 @@ import {ISustainabilityCoin} from "./interfaces/ISustainabilityCoin.sol";
 import {UUPSUpgradeable,Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol"; // If using OwnableUpgradeable
 
-
-
 /**
  * @title EcoLedger
  * @notice carbon ledger
@@ -110,42 +108,12 @@ ISustainabilityCoin public  sustainabilityToken;
           emit CarbonProjectEvent(name, annualemissions, annualWaterusage, emissionsReductionProject, false);
     }
 
-       function payForCarbon(uint256 id)  public payable {
+
+      function validateRegisteredProject(uint256 id) public onlyOwner {
         require(isRegistered[id],"his project ID is not registered");
-        require(idToProject[id].Validated, "This project is already validated");
         require(!idToProject[id].Paid, "This project is already Paid");
         CarbonProject storage carbonProject = idToProject[id];
-        uint256 totalToPay = _calculateTotalPayment(id);  
-        require(msg.value >= totalToPay, "Insufficient payment.");
-
-        if (msg.value > totalToPay) {
-            payable(msg.sender).transfer(msg.value - totalToPay);
-        }
-         
-        uint256 weightedContribution = (carbonProject.Annualemissions *2) + (carbonProject.AnnualWaterusage *1);
-         ISustainabilityCoin(sustainabilityToken).mint(msg.sender, weightedContribution);
         
-
-         idToProject[id].Paid = true;
-
-       }
-       function _calculateTotalPayment(uint256 id) internal view  returns(uint256) {
-        CarbonProject memory carbonProject = idToProject[id];
-        uint256 annualEmmisions  =  carbonProject.Annualemissions * 10**18 ;
-        uint256 annualWaterUsage = carbonProject.AnnualWaterusage * 10**18 ;
-         
-        uint256 needToPay = annualEmmisions + annualWaterUsage; 
-
-        return needToPay;
-       }
-
-
-    function validateRegisteredProject(uint256 id) public onlyOwner {
-        require(isRegistered[id],"his project ID is not registered");
-        require(!idToProject[id].Paid, "This project is already Paid");
-        CarbonProject storage carbonProject = idToProject[id];
-
-         
         require(!carbonProject.Validated, "This project is already validated");
         carbonProject.Validated = true;
 
@@ -156,9 +124,6 @@ ISustainabilityCoin public  sustainabilityToken;
             }
         }
         
-
-
-
         emit CarbonProjectEvent(
             carbonProject.name,
             carbonProject.Annualemissions,
@@ -169,7 +134,41 @@ ISustainabilityCoin public  sustainabilityToken;
     }
 
 
-   
+    function _calculateTotalPayment(uint256 id)  public view  returns(uint256) {
+        CarbonProject memory carbonProject = idToProject[id];
+        uint256 annualEmmisions  =  carbonProject.Annualemissions * 10**18 ;
+        uint256 annualWaterUsage = carbonProject.AnnualWaterusage * 10**18 ;
+         
+        uint256 needToPay = annualEmmisions + annualWaterUsage; 
+
+        return needToPay;
+       }
+
+
+       function payForCarbon(uint256 id)  public payable {
+        require(isRegistered[id],"his project ID is not registered");
+        require(idToProject[id].Validated, "This project is already validated");
+        require(!idToProject[id].Paid, "This project is already Paid");
+        CarbonProject storage carbonProject = idToProject[id];
+        uint256 totalToPay = _calculateTotalPayment(id);  
+        require(msg.value >= totalToPay, "Insufficient payment.");
+
+        uint256 weightedContribution = (carbonProject.Annualemissions *2) + (carbonProject.AnnualWaterusage *1);
+        idToProject[id].Paid = true;
+        // console.log("weightedContribution from the contract",weightedContribution);
+         ISustainabilityCoin(sustainabilityToken).mint(msg.sender,weightedContribution);
+
+         for (uint i = 0; i < carbonProjects.length; i++) {
+            if (carbonProjects[i].id == id) {
+                carbonProjects[i].Paid = true;
+                break;
+            }
+        }
+
+        }
+       
+
+
     function insurance(uint256 id) public payable { 
         require(isRegistered[id],"his project ID is not registered");
         require(idToProject[id].Paid, "This project is already Paid");
@@ -249,7 +248,7 @@ ISustainabilityCoin public  sustainabilityToken;
     function buySustainabilityCoin(uint256 amount) public payable {
         uint256 toPay = priceOfSustainabilityCoin(amount);
         require(msg.value >= toPay, "Insufficient payment");   
-        ISustainabilityCoin(sustainabilityToken).mint(msg.sender, amount);
+        ISustainabilityCoin(sustainabilityToken).mint(msg.sender,amount);     
     }
     function contributeTosayNoCarbon(uint256 amount) public payable {
         require(msg.value >= amount, "Insufficient payment");    

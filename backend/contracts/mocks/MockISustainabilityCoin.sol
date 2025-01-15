@@ -8,7 +8,7 @@ contract MockISustainabilityCoin is ISustainabilityCoin {
     // Mapping to track balances for the mock token
     mapping(address => uint256) private _balances;
 
-    function mint(address to, uint256 amount) external override {
+    function mint(address to,uint256 amount) external override {
         // Increase the balance of the recipient
         _balances[to] += amount;
     }

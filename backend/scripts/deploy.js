@@ -3,13 +3,15 @@ const path = require("path");
 const { ethers, upgrades } = require("hardhat");
 
 async function main() {
-    console.log("Starting deployment...");
+    console.log("Starting deployment...");                    
 
     // Deploy SustainabilityCoin
     const SustainabilityCoin = await ethers.getContractFactory("SustainabilityCoin");
     const initialSupply = ethers.parseUnits("1000000", 18); // 1,000,000 SUS tokens with 18 decimals
     const sustainabilityCoin = await SustainabilityCoin.deploy(initialSupply);
     await sustainabilityCoin.waitForDeployment();
+    console.log("OWNER",await sustainabilityCoin.owner());
+    
     
     const sustainabilityCoinAddress = await sustainabilityCoin.getAddress();
     console.log("SustainabilityCoin deployed at:", sustainabilityCoinAddress);
@@ -35,6 +37,8 @@ async function main() {
     
     const ecoLedgerAddress = await ecoLedger.getAddress();
     console.log("EcoLedger deployed at:", ecoLedgerAddress);
+    await sustainabilityCoin.addMinter(ecoLedgerAddress)
+
 
     // Output the addresses for further usage
     console.log("Deployment completed successfully!");

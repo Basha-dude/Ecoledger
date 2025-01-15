@@ -6,6 +6,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract SustainabilityCoin is ERC20 {
     // Add owner variable if you want to restrict minting
     address public owner;
+    mapping (address => bool) IsAllowedMinter ;
 
     constructor(uint256 initialSupply) ERC20("SustainabilityCoin", "SUS") {
         owner = msg.sender;  // Set the deployer as owner
@@ -14,13 +15,18 @@ contract SustainabilityCoin is ERC20 {
 
     // Optional: Add a modifier to restrict minting
     modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can mint");
+        require( IsAllowedMinter[msg.sender] || msg.sender == owner, "Not authorized to mint");
         _;
     }
 
+
     // Optional: Add a mint function if you want to mint more tokens later
-    function mint(uint256 amount) public onlyOwner {
-        _mint(msg.sender, amount);
+    function mint(address to,uint256 amount) public onlyOwner {
+        _mint(to, amount);
+    }
+
+    function addMinter(address minter) public onlyOwner {
+        IsAllowedMinter[minter] = true;
     }
 
     function balance() public view returns(uint256) {

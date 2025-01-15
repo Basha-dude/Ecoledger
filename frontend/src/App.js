@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import abi from "../src/abi/contracts/Ecoledger.sol/EcoLedger.json"
+import TokenAbi from "../src/abi/contracts/tokens/SustainabilityCoin.sol/SustainabilityCoin.json"
 import { ethers } from "ethers";
 import deploymentConfig from './abi/deployment-config.json';
 
@@ -8,10 +9,12 @@ const App = () => {
 
   const { sustainabilityCoinAddress, ecoLedgerAddress } = deploymentConfig;
   const EcoLedgerAbi = abi.abi
+  const sustainabilityCoinAbi = TokenAbi.abi
   const EcoLedgerAdress = ecoLedgerAddress
   const [validatedProjects, setValidatedProjects] = useState([])
   const [walletAccount, setwalletAccount] = useState("")
  const [contract, setContract] = useState(null)
+ const [TokenInstance, setTokenInstance] = useState(null)
  const [notValidatedProjects, setNotValidatedProjects] = useState([])
   const [projectDetails, setProjectDetails] = useState({
     name:"",
@@ -34,6 +37,9 @@ const [projects, setProjects] = useState([])
         const provider  = new ethers.BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
        const  contractInstance = new ethers.Contract(EcoLedgerAdress,EcoLedgerAbi,signer)
+       const TokenContractInstance = new ethers.Contract(sustainabilityCoinAddress,sustainabilityCoinAbi,signer)
+       console.log("signer first at contract",signer);
+         setTokenInstance(TokenContractInstance)
         setContract(contractInstance)
        
 
@@ -119,10 +125,6 @@ const [projects, setProjects] = useState([])
       console.log("Fetched Projects IDs:", getAllRegisteredProjects.map(project => project[0]));
       console.log("projects from contract:", getAllRegisteredProjects);
 
-      
-
-
-      
       setProjects(getAllRegisteredProjects)
       // if (getAllRegisteredProjects) {
 
@@ -137,9 +139,22 @@ const [projects, setProjects] = useState([])
   const ValidateTheRegister = async(id) => {
     console.log("ValidateTheRegister ID", id);
     try {
+
+      //lekapoina vasthundi
       const idToValidate = id.toString(); // Convert to string
 
-      const validateTx = await contract.validateRegisteredProject(idToValidate);
+
+      //EEE BELOW CODE LEKUNNA VASTHUNDI
+      /* 
+      
+      ,{
+        maxPriorityFeePerGas: ethers.parseUnits('2', 'gwei'),  // Tip
+        maxFeePerGas: ethers.parseUnits('20', 'gwei'),  // Max fee willing to pay
+        gasLimit: 1000000
+    }
+      
+      */
+      const validateTx = await contract.validateRegisteredProject(id);
 
       await validateTx.wait();
     
@@ -193,8 +208,50 @@ const [projects, setProjects] = useState([])
     
   }
 
+const payTotheProject = async (id) => {
+  try {
+      // First get contract instance if not already done
+      if (!contract) {
+          alert("Please connect wallet first");
+          return;
+      }
 
-  
+      // Get total payment amount
+      const totalPay = await contract._calculateTotalPayment(id);
+      console.log("Total payment in wei:", totalPay.toString());
+      console.log("Total payment in ETH:", ethers.formatEther(totalPay));
+      
+      // Try sending with specific parameters
+      const PayTx = await contract.payForCarbon(id, {
+          value: totalPay,
+            });
+            const provider  = new ethers.BrowserProvider(window.ethereum)
+        const signer = await provider.getSigner()
+        console.log("signer first at contract",signer.address);
+
+            const balance = await TokenInstance.balance()
+            console.log("token balance of signer",balance);
+            
+      
+      console.log("Transaction sent:", PayTx.hash);
+      const receipt = await PayTx.wait();
+      console.log("Transaction confirmed:", receipt);
+      
+      alert("Payment successful!");
+      await fetchProjects();
+
+      
+  } catch (error) {
+      console.error("Detailed error:", {
+          message: error.message,
+          code: error.code,
+          data: error.data,
+          transaction: error.transaction
+      });
+      
+      alert("Transaction failed. Please try again or check console for details.");
+  }
+};
 
   useEffect(() => {
     if (window.ethereum) {
@@ -257,7 +314,9 @@ const [projects, setProjects] = useState([])
     <p>Annual Emissions: {project[2].toString()} Tons</p> {/* emissions at index 2 */}
     <p>Annual Waterusage:{project[3].toString()} Liters</p>
     <p>Validated:{project[5].toString()}</p>
+    <p>Paid:{project[6].toString()}</p>
     {project[5] ? "" : <button onClick={() => ValidateTheRegister(project[0])}>Validate</button> }
+    {project[6] ? "" : <button onClick={() => payTotheProject(project[0])}>PAY</button>}
     
     <br />
     <br />
