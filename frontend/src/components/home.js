@@ -74,7 +74,7 @@ const Home = ({projectDetails,setProjectDetails,contract}) => {
    
    <br /><label>emissionsReductionProject:</label>
      <input type='checkbox' checked={projectDetails.emissionsReductionProject}
-      onClick={(e) => setProjectDetails({...projectDetails,emissionsReductionProject:e.target.checked})} 
+      onChange={(e) => setProjectDetails({...projectDetails,emissionsReductionProject:e.target.checked})} 
       onKeyDown={(e)=> setProjectDetails({...projectDetails,emissionsReductionProject:!projectDetails.emissionsReductionProject})}
      ></input> 
        <br />

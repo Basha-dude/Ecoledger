@@ -8,12 +8,11 @@ const ValidateProjects = ({projects, walletAccount,ValidateTheRegister}) => {
    
       const loadProjects = async () => {
         if (walletAccount) {
-          console.log("Fetching projects for wallet:", walletAccount);
+          console.log("Fetching projects for wallet from ValidateProjects:", walletAccount);
           // Don't call ValidateTheRegister here since it needs an ID
           // Instead, pass fetchValidatedProjects as a prop if you need initial loading
         } else {
-          console.log("Wallet not connected. Skipping fetch.");
-          alert("Connect wallet to view registered projects");
+          alert("Connect wallet to view ValidateProjects projects");
         }
       };
       

@@ -6,11 +6,9 @@ const RegisteredProjects =  ({ projects, fetchProjects,walletAccount }) => {
   useEffect(() => {
     const loadProjects = async () => {
       if (walletAccount) {
-        console.log("Fetching projects for wallet:", walletAccount);
         await fetchProjects();
-      } else {
-        console.log("Wallet not connected. Skipping fetch.");
       }
+    
     };
 
     loadProjects();

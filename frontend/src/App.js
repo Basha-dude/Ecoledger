@@ -9,10 +9,12 @@ import Navbar from './components/navbar'
 import Home from './components/home';
 import ValidateProjects from './components/validateProjects';
 import ValidatedProjects from './components/validatedProjects'
-import NotValidatedProjects  from "./components/NotValidatedProjects";
+import PayProject  from "./components/PayProject";
+import PaidProjects from './components/PaidProjects';
 
 
-
+// double logging + need to separete when they validated need to remove from the componenet, 
+// and same for the  paid component
 const App = () => {
 
   const { sustainabilityCoinAddress, ecoLedgerAddress } = deploymentConfig;
@@ -24,6 +26,8 @@ const App = () => {
  const [contract, setContract] = useState(null)
  const [TokenInstance, setTokenInstance] = useState(null)
  const [notValidatedProjects, setNotValidatedProjects] = useState([])
+ const [paidProjects, setPaidProjects] = useState([])
+
   const [projectDetails, setProjectDetails] = useState({
     name:"",
     annualemissions:"",
@@ -70,7 +74,7 @@ const [projects, setProjects] = useState([])
   }
 
   
-  const fetchProjects = async () => {
+  const fetchProjects =  async () => {
     if (!walletAccount) {
       alert("connect wallet to Registered projects")
        return
@@ -95,6 +99,7 @@ const [projects, setProjects] = useState([])
     } catch (error) {
       console.error("Error fetching Projects :",error); 
     }
+  
   }
 
   const ValidateTheRegister = async(id) => {
@@ -102,7 +107,7 @@ const [projects, setProjects] = useState([])
     try {
 
       //lekapoina vasthundi
-      const idToValidate = id.toString(); // Convert to string
+      // const idToValidate = id.toString(); // Convert to string
 
 
       //EEE BELOW CODE LEKUNNA VASTHUNDI
@@ -203,8 +208,6 @@ const payTotheProject = async (id) => {
       
       alert("Payment successful!");
       await fetchProjects();
-
-      
   } catch (error) {
       console.error("Detailed error:", {
           message: error.message,
@@ -216,6 +219,21 @@ const payTotheProject = async (id) => {
       alert("Transaction failed. Please try again or check console for details.");
   }
 };
+
+const fetchPaidProjects = async () => {
+  if(!walletAccount){
+      alert("connect wallet from paid projects")
+          }
+          try {
+            const getAllRegisteredProjects = await contract.getAllRegisteredProjects() 
+            const paidprojects = getAllRegisteredProjects.filter((project) => (project[6]===true))
+            console.log("Filtered Paid Projects:", paidprojects);            
+            setPaidProjects(paidprojects)
+          } catch (error) {
+            console.log(error);
+            
+          }
+}
 
   useEffect(() => {
     if (window.ethereum) {
@@ -258,11 +276,18 @@ const payTotheProject = async (id) => {
 
       </Route>
 
-      <Route path='/not-validated-projects' 
-      element={<NotValidatedProjects fetchNotValidatedProjects={fetchNotValidatedProjects} 
+      <Route path='/payprojects' 
+      element={<PayProject  
       walletAccount={walletAccount} 
-      notValidatedProjects={notValidatedProjects}
-       ValidateTheRegister={ValidateTheRegister}
+      payTotheProject={payTotheProject}
+      projects={projects}
+       />}></Route>
+
+<Route path='/paidprojects' 
+      element={<PaidProjects  
+      walletAccount={walletAccount} 
+      paidProjects ={paidProjects}
+      fetchPaidProjects={fetchPaidProjects}
        />}></Route>
 
     </Routes>
