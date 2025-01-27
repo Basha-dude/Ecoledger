@@ -3,6 +3,9 @@ import  { useEffect } from 'react';
 
 
 const ValidatedProjects = ({validatedProjects,fetchValidatedProjects,walletAccount}) => {
+  /* double logging happens because of react strictmode,
+ the strict mode calls the useEffect twice, because of that loggin twice
+  */
      useEffect(() => {
 
      const loadProjects = async () => {

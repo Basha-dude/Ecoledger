@@ -1,13 +1,19 @@
 import React from 'react'
 import  { useEffect } from 'react';
 
-//in need write the pay for the Carbon instead of NotValidatedProjects in this component
-const PayProject = ({walletAccount,payTotheProject,projects}) => {
+const PayProject = ({walletAccount,payTotheProject,hadToPaidProjects,fetchHadToPaidProjects}) => {
+  /* double logging happens because of react strictmode,
+ the strict mode calls the useEffect twice, because of that loggin twice
+  */
     useEffect(() => {
         const loadPayProjects = async () =>{
             if (walletAccount) {
             console.log("Pay projects");
-           
+            /*
+            this is for when the component mounts , it will show it on the dom,
+            if it is not there, the projects will go into the `hadToPaidProjects` array
+             */ 
+             await fetchHadToPaidProjects()
             }
         };
         loadPayProjects()
@@ -18,8 +24,8 @@ const PayProject = ({walletAccount,payTotheProject,projects}) => {
     <div>Pay Projects
     <br />
     <br />
-    {projects.length > 0 ? 
-        projects.map((project)=> (
+    {hadToPaidProjects.length > 0 ? 
+      hadToPaidProjects.map((project)=> (
         <div key={project[0]}>
        <p> Project ID:- {project[0]} </p>
        <p> Name: {project[1]} </p>
@@ -32,7 +38,7 @@ const PayProject = ({walletAccount,payTotheProject,projects}) => {
     <br/>
         </div>
        ))
-      : "All Projects are Paid"}   
+      : "Empty"}   
     </div>
     
   )

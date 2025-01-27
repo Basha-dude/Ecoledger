@@ -13,8 +13,14 @@ import PayProject  from "./components/PayProject";
 import PaidProjects from './components/PaidProjects';
 
 
-// double logging + need to separete when they validated need to remove from the componenet, 
-// and same for the  paid component
+/* double logging happens because of react strictmode,
+ the strict mode calls the useEffect twice, because of that loggin twice
+  */ 
+
+/* completed this  need to separete when they validated need to remove from the componenet */
+
+//  completed  to separete when they paid need to remove from the componenet, 
+
 const App = () => {
 
   const { sustainabilityCoinAddress, ecoLedgerAddress } = deploymentConfig;
@@ -27,6 +33,8 @@ const App = () => {
  const [TokenInstance, setTokenInstance] = useState(null)
  const [notValidatedProjects, setNotValidatedProjects] = useState([])
  const [paidProjects, setPaidProjects] = useState([])
+ const [hadToPaidProjects, sethadToPaidProjects] = useState([])
+
 
   const [projectDetails, setProjectDetails] = useState({
     name:"",
@@ -125,11 +133,13 @@ const [projects, setProjects] = useState([])
       await validateTx.wait();
     
       alert("Project validated");
+      await fetchNotValidatedProjects()
+
      
         // Fetch the updated list of registered projects
-      await fetchProjects();
-      await fetchValidatedProjects()
-      await fetchNotValidatedProjects()      
+      // await fetchProjects();
+      // await fetchValidatedProjects()
+      // await fetchNotValidatedProjects()      
     } catch (error) {
       console.error("Error validating project:", error);
       if (error.message.includes("project ID is not registered")) {
@@ -202,12 +212,13 @@ const payTotheProject = async (id) => {
             console.log("token balance of signer",balance);
             
       
-      console.log("Transaction sent:", PayTx.hash);
       const receipt = await PayTx.wait();
       console.log("Transaction confirmed:", receipt);
       
       alert("Payment successful!");
-      await fetchProjects();
+/* calling  this to update the latest projects to remove the paid one and 
+  update the latest ones */
+      await fetchHadToPaidProjects();
   } catch (error) {
       console.error("Detailed error:", {
           message: error.message,
@@ -219,6 +230,18 @@ const payTotheProject = async (id) => {
       alert("Transaction failed. Please try again or check console for details.");
   }
 };
+const fetchHadToPaidProjects = async() => {
+      try {
+         const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
+          const registeredprojects = getAllRegisteredProjects.filter((project) => project[6]===false)
+          console.log("Filtered hadToPaidProjects Projects:", registeredprojects);            
+
+          sethadToPaidProjects(registeredprojects)
+      } catch (error) {
+        console.log(error);
+        
+      }
+}
 
 const fetchPaidProjects = async () => {
   if(!walletAccount){
@@ -266,7 +289,7 @@ const fetchPaidProjects = async () => {
       </Route>
 
       <Route path='/validate-projects' 
-      element={<ValidateProjects validatedProjects={validatedProjects} projects ={projects} 
+      element={<ValidateProjects notValidatedProjects={notValidatedProjects} fetchNotValidatedProjects={fetchNotValidatedProjects} 
        walletAccount ={walletAccount}
       ValidateTheRegister={ValidateTheRegister} 
       />}>
@@ -280,7 +303,8 @@ const fetchPaidProjects = async () => {
       element={<PayProject  
       walletAccount={walletAccount} 
       payTotheProject={payTotheProject}
-      projects={projects}
+      hadToPaidProjects={hadToPaidProjects}
+      fetchHadToPaidProjects={fetchHadToPaidProjects}
        />}></Route>
 
 <Route path='/paidprojects' 

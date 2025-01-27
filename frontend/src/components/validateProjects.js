@@ -1,19 +1,27 @@
 import React from 'react'
 import  { useEffect } from 'react';
+//fetchNotValidatedProjects
 
+const ValidateProjects = ({notValidatedProjects,fetchNotValidatedProjects, walletAccount,ValidateTheRegister}) => {
+/* double logging happens because of react strictmode,
+ the strict mode calls the useEffect twice, because of that loggin twice
+  */
 
-const ValidateProjects = ({projects, walletAccount,ValidateTheRegister}) => {
-
-  useEffect(() => {
+  useEffect(() => {/* only triggers when the component mounts
+                      and the variable in the dependence array changes  */
    
       const loadProjects = async () => {
         if (walletAccount) {
           console.log("Fetching projects for wallet from ValidateProjects:", walletAccount);
-          // Don't call ValidateTheRegister here since it needs an ID
-          // Instead, pass fetchValidatedProjects as a prop if you need initial loading
-        } else {
-          alert("Connect wallet to view ValidateProjects projects");
-        }
+          // Don't call ```ValidateTheRegister``` here since it needs an ID
+          /*
+          which means for first time to see it on the dom 
+           this is for when the component mounts , it will show it on the dom,
+            if it is not there, the projects will go into the `notValidatedProjects` array
+             */ 
+          await fetchNotValidatedProjects()
+
+        } 
       };
       
       loadProjects();
@@ -22,7 +30,7 @@ const ValidateProjects = ({projects, walletAccount,ValidateTheRegister}) => {
     <div>
           <h1>Validate Project </h1>
           <br />
-          {projects.length >0  ? projects.map((project)=>(
+          {notValidatedProjects.length >0  ? notValidatedProjects.map((project)=>(
             <div key={project[0]}>
             <p>Project ID: {project[0]}</p>
             <p>Name: {project[1]}</p>

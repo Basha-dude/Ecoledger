@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react'
 
 const PaidProjects = ({walletAccount,paidProjects,fetchPaidProjects}) => {
+  /* double logging happens because of react strictmode,
+ the strict mode calls the useEffect twice, because of that loggin twice
+  */
     useEffect(() => {
         const loadfetchPaidProjects = async () => {
             if (walletAccount) {
@@ -26,7 +29,7 @@ const PaidProjects = ({walletAccount,paidProjects,fetchPaidProjects}) => {
             <br/>
             <br />
             </div>
-    )) : "All projects are Paid"}
+    )) : "Empty"}
     </div>
   )
 }
