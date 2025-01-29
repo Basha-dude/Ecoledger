@@ -11,15 +11,15 @@ import ValidateProjects from './components/validateProjects';
 import ValidatedProjects from './components/validatedProjects'
 import PayProject  from "./components/PayProject";
 import PaidProjects from './components/PaidProjects';
+import  Inusrance  from "./components/Inusrance";
 
 
 /* double logging happens because of react strictmode,
  the strict mode calls the useEffect twice, because of that loggin twice
   */ 
 
-/* completed this  need to separete when they validated need to remove from the componenet */
 
-//  completed  to separete when they paid need to remove from the componenet, 
+//completed remove immediately on the dom, the projects which paid the insurance   
 
 const App = () => {
 
@@ -34,6 +34,7 @@ const App = () => {
  const [notValidatedProjects, setNotValidatedProjects] = useState([])
  const [paidProjects, setPaidProjects] = useState([])
  const [hadToPaidProjects, sethadToPaidProjects] = useState([])
+ const [toInsuranceProjets, setToInsuranceProjects] = useState([])
 
 
   const [projectDetails, setProjectDetails] = useState({
@@ -73,7 +74,6 @@ const [projects, setProjects] = useState([])
   /* 
    @params: eee accounts ,  @event window.ethereum.on("accountsChanged",handleChange)
                               nunchi vasthadhi
-
   */
   const handleChange = async(accounts) => {
     if (accounts.length > 0) {
@@ -93,7 +93,7 @@ const [projects, setProjects] = useState([])
      
       const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
                              /* 
-                              map lo project lo unna first element ni array lo ki push chesthaamu
+                               map lo project lo unna first element ni array lo ki push chesthaamu
                              */
       console.log("Fetched Projects IDs:", getAllRegisteredProjects.map(project => project[0]));
       console.log("projects from contract:", getAllRegisteredProjects);
@@ -233,7 +233,7 @@ const payTotheProject = async (id) => {
 const fetchHadToPaidProjects = async() => {
       try {
          const getAllRegisteredProjects = await contract.getAllRegisteredProjects()
-          const registeredprojects = getAllRegisteredProjects.filter((project) => project[6]===false)
+          const registeredprojects = getAllRegisteredProjects.filter((project) => project[6]===false && project[5]===true)
           console.log("Filtered hadToPaidProjects Projects:", registeredprojects);            
 
           sethadToPaidProjects(registeredprojects)
@@ -257,6 +257,72 @@ const fetchPaidProjects = async () => {
             
           }
 }
+
+
+const fetchToInsuranceProjets = async () => {
+  try {
+    // Temporary debug logs
+    console.log("Fetching all projects...");
+    const getAllRegisteredProjects = await contract.getAllRegisteredProjects();
+    console.log("Raw projects from contract:", getAllRegisteredProjects);
+
+    // Get insurance status for each project
+    /* 
+    Promise.all:
+
+This is used when you have multiple promises and want to wait for all of them to complete
+It takes an array of promises and returns a single Promise that resolves when all promises are done
+
+ example:
+
+Without Promise.all
+const result1 = await promise1;
+const result2 = await promise2;
+const result3 = await promise3;
+
+ With Promise.all - faster as they run in parallel
+const [result1, result2, result3] = await Promise.all([
+    promise1,
+    promise2,
+    promise3
+]);
+    */
+
+// not used for loop for this ``If a single insuranceOrNot call fails, the entire function crashes.``
+
+    const projectsWithInsurance = await Promise.all(
+      getAllRegisteredProjects.map(async (project) => {
+        console.log("project project",project);
+
+        const isInsured = await contract.insuranceOrNot(project.id);
+        console.log(`Project ${project.id} insurance status:`, isInsured);
+       //here we are adding insured property to the  project(object)
+        return { ...project, isInsured };
+      })
+    );
+
+    // Filter logic
+    const uninsuredProjects = projectsWithInsurance.filter(
+      (project) => project[6] === true && project.isInsured === false // Paid is at index 6
+    );
+    console.log("Filtered uninsured projects:", uninsuredProjects);
+
+    setToInsuranceProjects(uninsuredProjects);
+  } catch (error) {
+    console.error("Error in fetchToInsuranceProjets:", error);
+  }
+};
+
+  const PayForInsurance = async(id) => {
+    const valueToPay = await contract._calculateInsurancePayment(id)
+     const Tx =   await contract.insurance(id,{value: valueToPay})
+      await Tx.wait()
+      alert("payment for insurance successful")
+      // we added this, 
+      // so after the payment for the insurance it immediately clears the project paid the insurance
+      await fetchToInsuranceProjets();
+  }      
+
 
   useEffect(() => {
     if (window.ethereum) {
@@ -313,6 +379,9 @@ const fetchPaidProjects = async () => {
       paidProjects ={paidProjects}
       fetchPaidProjects={fetchPaidProjects}
        />}></Route>
+       <Route path='/insurance' element={<Inusrance  toInsuranceProjets={toInsuranceProjets} PayForInsurance={PayForInsurance} fetchToInsuranceProjets={fetchToInsuranceProjets}/>}>
+
+       </Route>
 
     </Routes>
     </Router>

@@ -61,8 +61,8 @@ const Home = ({projectDetails,setProjectDetails,contract}) => {
     <h1>HOME</h1>
     <br />
     
-    <label>name:</label>
-
+    <label>name:</label>                                                           
+                                                                     {/* copires the previous project details and overwrites the name property  */}
    <input type='text' value={projectDetails.name} onChange={(e) => setProjectDetails({...projectDetails,name:e.target.value})}></input>
    <br />
    <label>annualemissions:</label>

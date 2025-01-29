@@ -175,11 +175,13 @@ describe("PAY FOR CARBON + VALIDATED PROJECT FUNCTION", function () {
     });
 
     it("should revert carbon", async function () {
+      const toPay  =  await ecoLedger._calculateInsurancePayment(1)
 
     await expect(ecoLedger.payForCarbon(1,{value: 0 })
-    ).to.be.revertedWith("Insufficient payment.");
-
+    ).to.be.revertedWith("Insufficient payment.");  
   });
+
+
 });
 
 });

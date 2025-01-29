@@ -10,6 +10,7 @@ const Navbar = ({connectingWallet,walletAccount}) => {
       <Link to="/validatedProjects"> Validated Projects</Link>
       <Link to="/payprojects">Pay Projects</Link>
       <Link to="/paidprojects">Paid Projects</Link>
+      <Link to="/insurance">Insurance</Link>
 
     {  walletAccount ? `${walletAccount.substring(0,6)}...${walletAccount.substring(walletAccount.length -4)}`:  <button onClick={connectingWallet}> CONNECT WALLET</button>}
 

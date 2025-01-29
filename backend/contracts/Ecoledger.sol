@@ -27,7 +27,7 @@ contract EcoLedger is UUPSUpgradeable,OwnableUpgradeable {
 
 mapping (uint => bool) public isRegistered;   
 mapping (uint => CarbonProject)idToProject;
-mapping (uint => bool) insuranceOrNot;
+mapping (uint => bool) public insuranceOrNot;
 mapping (uint => bool) insuranceClaimedOrNot;
 mapping(address => uint256) public contributions;
 
@@ -140,8 +140,8 @@ ISustainabilityCoin public  sustainabilityToken;
         uint256 annualWaterUsage = carbonProject.AnnualWaterusage * 10**18 ;
          
         uint256 needToPay = annualEmmisions + annualWaterUsage; 
-
         return needToPay;
+
        }
 
 
@@ -155,9 +155,8 @@ ISustainabilityCoin public  sustainabilityToken;
 
         uint256 weightedContribution = (carbonProject.Annualemissions *2) + (carbonProject.AnnualWaterusage *1);
         idToProject[id].Paid = true;
-        // console.log("weightedContribution from the contract",weightedContribution);
          ISustainabilityCoin(sustainabilityToken).mint(msg.sender,weightedContribution);
-
+       
          for (uint i = 0; i < carbonProjects.length; i++) {
             if (carbonProjects[i].id == id) {
                 carbonProjects[i].Paid = true;
@@ -167,18 +166,16 @@ ISustainabilityCoin public  sustainabilityToken;
 
         }
        
-
-
     function insurance(uint256 id) public payable { 
         require(isRegistered[id],"his project ID is not registered");
         require(idToProject[id].Paid, "This project is already Paid");
         require(idToProject[id].Validated, "This project is not validated");
-        require(!insuranceOrNot[id], "this is project is not insurance");
+        require(!insuranceOrNot[id], "this is project is Already  insuranced");
 
        
          uint256 insuranceToPay =  _calculateInsurancePayment(id) ; 
 
-         require(msg.value >= insuranceToPay, "Insufficient payment.");
+         require(msg.value >= insuranceToPay, "Insufficient payment For Insurance");
 
          if (msg.value > insuranceToPay) { 
              payable(msg.sender).transfer(msg.value - insuranceToPay); 
@@ -190,7 +187,7 @@ ISustainabilityCoin public  sustainabilityToken;
 
     }
 
-    function _calculateInsurancePayment(uint256 id) internal view  returns (uint256) {
+    function _calculateInsurancePayment(uint256 id) public view  returns (uint256) {
         uint256 totalPay = _calculateTotalPayment(id);
          
         uint256 scaledPercentage = insurancePercentage * SCALE;
@@ -198,7 +195,7 @@ ISustainabilityCoin public  sustainabilityToken;
         
         uint256 denominator = (100 * SCALE);
         uint256 insuranceToPay =  numerator / denominator;
-
+          console.log("from the contract `insuranceToPay`",insuranceToPay);
         return insuranceToPay;
     }
     function claimInsurance(uint256 id)  public {
@@ -264,7 +261,9 @@ ISustainabilityCoin public  sustainabilityToken;
     }
 
  
-
+/////////////////
+//   GETTERS  ///
+//////////////////
 function getAllRegisteredProjectIds() external view returns (uint256[] memory) {
     uint256[] memory projectIds = new uint256[](totalProjects);
     for (uint256 i = 0; i < totalProjects; i++) {
