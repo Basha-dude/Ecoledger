@@ -28,7 +28,7 @@ contract EcoLedger is UUPSUpgradeable,OwnableUpgradeable {
 mapping (uint => bool) public isRegistered;   
 mapping (uint => CarbonProject)idToProject;
 mapping (uint => bool) public insuranceOrNot;
-mapping (uint => bool) insuranceClaimedOrNot;
+mapping (uint => bool) public insuranceClaimedOrNot; 
 mapping(address => uint256) public contributions;
 
 ISustainabilityCoin public  sustainabilityToken; 

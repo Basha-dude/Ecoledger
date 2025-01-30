@@ -12,6 +12,7 @@ import ValidatedProjects from './components/validatedProjects'
 import PayProject  from "./components/PayProject";
 import PaidProjects from './components/PaidProjects';
 import  Inusrance  from "./components/Inusrance";
+import ClaimInsurance from "./components/ClaimInsurance";
 
 
 /* double logging happens because of react strictmode,
@@ -19,7 +20,8 @@ import  Inusrance  from "./components/Inusrance";
   */ 
 
 
-//completed remove immediately on the dom, the projects which paid the insurance   
+//completed the claim insurance and  remove immediately on the dom,
+// need to show the  the projects which are claimed the insurance   
 
 const App = () => {
 
@@ -35,6 +37,7 @@ const App = () => {
  const [paidProjects, setPaidProjects] = useState([])
  const [hadToPaidProjects, sethadToPaidProjects] = useState([])
  const [toInsuranceProjets, setToInsuranceProjects] = useState([])
+ const [projectsToClaimInsurance, setprojectsToClaimInsurance] = useState([])
 
 
   const [projectDetails, setProjectDetails] = useState({
@@ -321,7 +324,31 @@ const [result1, result2, result3] = await Promise.all([
       // we added this, 
       // so after the payment for the insurance it immediately clears the project paid the insurance
       await fetchToInsuranceProjets();
-  }      
+  }    
+  
+  const getTheInsurance= async (id) =>{
+    const Tx = await contract.claimInsurance(id)
+             await Tx.wait() 
+        alert("Claim successful")
+      await  fetchInsuranceProjetsToClaim();
+
+  }
+
+  const fetchInsuranceProjetsToClaim = async() => {
+      const getAllRegisteredProjects = await contract.getAllRegisteredProjects();
+
+      const projectsWithOutInsurance = await Promise.all(
+         getAllRegisteredProjects.map( async (project)=> {
+          const isInsured = await contract.insuranceOrNot(project.id) 
+          const claimOrNot = await contract.insuranceClaimedOrNot(project.id)
+          console.log(`project ${project.id} is ${isInsured}`);
+          return{...project,isInsured,claimOrNot}
+        })
+      )
+
+      const projects = projectsWithOutInsurance.filter((project)=> project[6] ===true && project.isInsured ===true && project.claimOrNot ===false)
+      setprojectsToClaimInsurance(projects)
+  } 
 
 
   useEffect(() => {
@@ -373,15 +400,21 @@ const [result1, result2, result3] = await Promise.all([
       fetchHadToPaidProjects={fetchHadToPaidProjects}
        />}></Route>
 
-<Route path='/paidprojects' 
+     <Route path='/paidprojects' 
       element={<PaidProjects  
       walletAccount={walletAccount} 
       paidProjects ={paidProjects}
       fetchPaidProjects={fetchPaidProjects}
        />}></Route>
+
        <Route path='/insurance' element={<Inusrance  toInsuranceProjets={toInsuranceProjets} PayForInsurance={PayForInsurance} fetchToInsuranceProjets={fetchToInsuranceProjets}/>}>
 
        </Route>
+
+       <Route path='/claimInsurance' element={<ClaimInsurance getTheInsurance={getTheInsurance} 
+        projectsToClaimInsurance={projectsToClaimInsurance}
+        fetchInsuranceProjetsToClaim={fetchInsuranceProjetsToClaim}
+        walletAccount={walletAccount}/>}></Route>
 
     </Routes>
     </Router>
