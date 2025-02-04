@@ -13,6 +13,7 @@ import PayProject  from "./components/PayProject";
 import PaidProjects from './components/PaidProjects';
 import  Inusrance  from "./components/Inusrance";
 import ClaimInsurance from "./components/ClaimInsurance";
+import InsurancedClaimed from "./components/InsurancedClaimed";
 
 
 /* double logging happens because of react strictmode,
@@ -38,6 +39,7 @@ const App = () => {
  const [hadToPaidProjects, sethadToPaidProjects] = useState([])
  const [toInsuranceProjets, setToInsuranceProjects] = useState([])
  const [projectsToClaimInsurance, setprojectsToClaimInsurance] = useState([])
+ const [claimedProjects, setclaimedProjects] = useState([])
 
 
   const [projectDetails, setProjectDetails] = useState({
@@ -349,6 +351,21 @@ const [result1, result2, result3] = await Promise.all([
       const projects = projectsWithOutInsurance.filter((project)=> project[6] ===true && project.isInsured ===true && project.claimOrNot ===false)
       setprojectsToClaimInsurance(projects)
   } 
+  const fetchClaimedInsuranceProjets = async() => {
+    const getAllRegisteredProjects = await contract.getAllRegisteredProjects();
+
+    const projectsWithOutInsurance = await Promise.all(
+       getAllRegisteredProjects.map( async (project)=> {
+        const isInsured = await contract.insuranceOrNot(project.id) 
+        const claimOrNot = await contract.insuranceClaimedOrNot(project.id)
+        console.log(`project ${project.id} is ${isInsured}`);
+        return{...project,isInsured,claimOrNot}
+      })
+    )
+
+    const projects = projectsWithOutInsurance.filter((project)=> project[6] ===true && project.isInsured ===true && project.claimOrNot ===true)
+    setclaimedProjects(projects)
+} 
 
 
   useEffect(() => {
@@ -415,6 +432,13 @@ const [result1, result2, result3] = await Promise.all([
         projectsToClaimInsurance={projectsToClaimInsurance}
         fetchInsuranceProjetsToClaim={fetchInsuranceProjetsToClaim}
         walletAccount={walletAccount}/>}></Route>
+
+        <Route path='/insuranceClaimed' element={<InsurancedClaimed
+        walletAccount={walletAccount} fetchClaimedInsuranceProjets={fetchClaimedInsuranceProjets} 
+         claimedProjects={claimedProjects}
+         />}>
+
+        </Route>
 
     </Routes>
     </Router>
