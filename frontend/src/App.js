@@ -14,6 +14,7 @@ import PaidProjects from './components/PaidProjects';
 import  Inusrance  from "./components/Inusrance";
 import ClaimInsurance from "./components/ClaimInsurance";
 import InsurancedClaimed from "./components/InsurancedClaimed";
+import ContributeToTheProject from './components/ContributeToTheProject';
 
 
 /* double logging happens because of react strictmode,
@@ -23,6 +24,8 @@ import InsurancedClaimed from "./components/InsurancedClaimed";
 
 //completed the claim insurance and  remove immediately on the dom,
 // need to show the  the projects which are claimed the insurance   
+
+
 
 const App = () => {
 
@@ -366,6 +369,18 @@ const [result1, result2, result3] = await Promise.all([
     const projects = projectsWithOutInsurance.filter((project)=> project[6] ===true && project.isInsured ===true && project.claimOrNot ===true)
     setclaimedProjects(projects)
 } 
+// const Contribute = async(amount) =>{
+//   try {
+//     const contribute = await contract.contributeTosayNoCarbon(amount, { value: amount });
+//     await contribute.wait();
+//     alert("Contribution successful");
+//   } catch (error) {
+//     console.error("Error contributing:", error);
+//     alert("Error contributing. Please try again later.");
+//   }
+// }
+
+
 
 
   useEffect(() => {
@@ -437,6 +452,9 @@ const [result1, result2, result3] = await Promise.all([
         walletAccount={walletAccount} fetchClaimedInsuranceProjets={fetchClaimedInsuranceProjets} 
          claimedProjects={claimedProjects}
          />}>
+
+        </Route>
+        <Route path='/contibuteToTheProject' element={<ContributeToTheProject contract={contract}/>}>
 
         </Route>
 

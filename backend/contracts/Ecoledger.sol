@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 import {ISustainabilityCoin} from "./interfaces/ISustainabilityCoin.sol";    
 import {UUPSUpgradeable,Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -87,7 +87,7 @@ ISustainabilityCoin public  sustainabilityToken;
 
         totalProjects++;
         projectId = totalProjects; 
-        console.log("projectId",projectId);
+        // console.log("projectId",projectId);
       
        
         
@@ -195,7 +195,7 @@ ISustainabilityCoin public  sustainabilityToken;
         
         uint256 denominator = (100 * SCALE);
         uint256 insuranceToPay =  numerator / denominator;
-          console.log("from the contract `insuranceToPay`",insuranceToPay);
+        //   console.log("from the contract `insuranceToPay`",insuranceToPay); 
         return insuranceToPay;
     }
     function claimInsurance(uint256 id)  public {

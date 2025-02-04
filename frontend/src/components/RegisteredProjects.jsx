@@ -1,6 +1,11 @@
 import React from 'react';
 import  { useEffect } from 'react';
 
+/* 
+
+
+*COMPONENT RENDER AYPOYETAPPUDU LOAD AVTHUNDHI
+*/
 
 const RegisteredProjects =  ({ projects, fetchProjects,walletAccount }) => {
   /* double logging happens because of react strictmode,

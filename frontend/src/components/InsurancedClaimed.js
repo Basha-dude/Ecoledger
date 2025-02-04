@@ -9,7 +9,6 @@ const InsurancedClaimed = ({walletAccount,fetchClaimedInsuranceProjets,claimedPr
                    } 
                    loadClaimedInsuranceProjets();
            }
-          
              
             }, [])
   return (
