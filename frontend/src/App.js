@@ -21,9 +21,15 @@ import ContributeToTheProject from './components/ContributeToTheProject';
  the strict mode calls the useEffect twice, because of that loggin twice
   */ 
 
+// completed   to buy the coins and displaying on dom
 
-//completed the claim insurance and  remove immediately on the dom,
-// need to show the  the projects which are claimed the insurance   
+   /** 
+   
+   *code optimize cheyyali and akkadey comments lo raayli and also errors
+   * recoil use cheyyali
+   * typescript use cheyyali
+
+    */
 
 
 
@@ -454,7 +460,10 @@ const [result1, result2, result3] = await Promise.all([
          />}>
 
         </Route>
-        <Route path='/contibuteToTheProject' element={<ContributeToTheProject contract={contract}/>}>
+        <Route path='/contibuteToTheProject' element={<ContributeToTheProject
+         contract={contract} TokenInstance={TokenInstance}
+       walletAccount={walletAccount}
+         />}>
 
         </Route>
 

@@ -1,11 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { ethers } from "ethers";
 
 
 
-const ContributeToTheProject = ({contract}) => {
-    const [amount, setAmount] = useState(''); // State to store the input valu
+const ContributeToTheProject = ({contract,TokenInstance,walletAccount}) => {
+    const [amount, setAmount] = useState(''); 
+    const [coinAmount, setcoinAmount] = useState("")
+    const [totalContributions, settotalContributions] = useState("")
+    const [contractBalance, setcontractBalance] = useState("")
+    const [tokenBalanceOfUser, settokenBalanceOfUser] = useState("")
     const Contribute = async () => {
         console.log("amount", amount);
     
@@ -21,16 +25,77 @@ const ContributeToTheProject = ({contract}) => {
           });
           await tx.wait();
           alert("Contribution successful");
+          await getTotalContributions()
+          await balance()
+
           setAmount('')
         } catch (error) {
           console.error("Contribution failed:", error);
         }
       };
+      const buyCoin = async() => {
+        console.log("amount", coinAmount);
     
+        if (!coinAmount) {
+          alert("Please enter an amount");
+          return;
+        }
+    
+        try {
+            const CoinPrice = await contract.priceOfSustainabilityCoin(coinAmount)
+            console.log("CoinPrice",CoinPrice);
+            
+            const buyTx = await contract.buySustainabilityCoin(coinAmount,{value:CoinPrice})
+            await buyTx.wait()
+          alert("Coin Contribution successful");
+          await getTotalContributions()
+          await balance()
+          await getTokenBalanceOfSigner()
 
+          setcoinAmount('')
+        } catch (error) {
+          console.error("Contribution failed:", error);
+        }
+        
+      }
+      const Withdraw = async() => {
+        const withdrawTx = await contract.withdraw()
+         await withdrawTx.wait()
+         await balance()
+         alert("withdraw successful")
+      }
+      const balance = async() => {
+                const balance = await contract.contractBalance()
+                setcontractBalance(balance)
+      }
+  
     const handleInputChange = (e) => {
         setAmount(e.target.value); // Update the amount whenever the input changes
       };
+      const handleCoinAmount = (e) =>{
+        setcoinAmount(e.target.value)
+      }
+      const getTotalContributions = async() => {
+        const getTotalContributionsFromContract = await contract.getTotalContributions()
+        console.log("getTotalContributionsFromContract",getTotalContributionsFromContract);
+        
+         settotalContributions(getTotalContributionsFromContract)
+      }
+      const getTokenBalanceOfSigner = async() => {
+          const provider  = new ethers.BrowserProvider(window.ethereum)
+           const signer = await provider.getSigner()
+        const tokenBalance = await TokenInstance.balanceOf(signer.address)
+        settokenBalanceOfUser(tokenBalance)
+      }
+      useEffect(() => {
+        const loadgetTokenBalanceOfSigner = async() =>{
+          await getTokenBalanceOfSigner()
+        }
+      
+        loadgetTokenBalanceOfSigner()
+        
+      }, [walletAccount])
+      
   return (
     <div>ContributeToTheProject
     <br />
@@ -56,8 +121,36 @@ const ContributeToTheProject = ({contract}) => {
        ✅ This is correct.
        
      */}
-    <button onClick={() => Contribute()}>Contribute</button>
-    
+    <button onClick={Contribute}>Contribute</button>
+    <br />
+
+    <label>Contribute:</label>
+    <input
+      type="number"
+    value={coinAmount}
+    onChange={handleCoinAmount}
+        placeholder="Enter amount">
+
+      </input>
+
+      <button onClick={buyCoin}>Buy Coin</button>
+      <br />
+      <br />
+
+      <p>TotalContributions: {totalContributions ? totalContributions : 0}</p>
+
+      <br />
+      <br />
+      <br />
+      <br />
+      <button onClick={Withdraw}>Withdraw</button>
+      <p>Contract Balance:{contractBalance ? contractBalance : 0} Wei</p>
+      <br />
+      <br />
+      <br />
+      <br />
+      <p>User's:{tokenBalanceOfUser ? tokenBalanceOfUser : 0} Coins</p>
+
     
     </div>
   )

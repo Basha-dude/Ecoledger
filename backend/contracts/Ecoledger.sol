@@ -245,6 +245,8 @@ ISustainabilityCoin public  sustainabilityToken;
     function buySustainabilityCoin(uint256 amount) public payable {
         uint256 toPay = priceOfSustainabilityCoin(amount);
         require(msg.value >= toPay, "Insufficient payment");   
+        contributions[msg.sender] += toPay;
+        totalContributions += toPay;
         ISustainabilityCoin(sustainabilityToken).mint(msg.sender,amount);     
     }
     function contributeTosayNoCarbon(uint256 amount) public payable {
@@ -407,6 +409,9 @@ function getAllRegisteredProjects() external view returns(CarbonProject[] memory
 function getcarbonProjectsLength() external view returns(uint256) {
     // Create a new array with the exact size needed
              return carbonProjects.length;  
+} 
+   function  contractBalance() external view returns(uint) {
+     return address(this).balance;   
 }
    }
 
