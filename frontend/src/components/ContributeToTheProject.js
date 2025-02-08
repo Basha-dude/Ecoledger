@@ -81,7 +81,18 @@ const ContributeToTheProject = ({contract,TokenInstance,walletAccount}) => {
         
          settotalContributions(getTotalContributionsFromContract)
       }
+      /* 
+      ERROR: ikkada error ichidhi cannot read properties of balanceOf ani so 
+       if (!TokenInstance) {
+          console.log("TokenInstance is not available.");
+          return;
+        } eee condition pettina tharvatha error ivvaledhu
+      */
       const getTokenBalanceOfSigner = async() => {
+        if (!TokenInstance) {
+          console.log("TokenInstance is not available.");
+          return;
+        }
           const provider  = new ethers.BrowserProvider(window.ethereum)
            const signer = await provider.getSigner()
         const tokenBalance = await TokenInstance.balanceOf(signer.address)

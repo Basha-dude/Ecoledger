@@ -31,8 +31,6 @@ import ContributeToTheProject from './components/ContributeToTheProject';
 
     */
 
-
-
 const App = () => {
 
   const { sustainabilityCoinAddress, ecoLedgerAddress } = deploymentConfig;
