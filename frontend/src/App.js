@@ -87,11 +87,23 @@ const [projects, setProjects] = useState([])
    @params: eee accounts ,  @event window.ethereum.on("accountsChanged",handleChange)
                               nunchi vasthadhi
   */
-  const handleChange = async(accounts) => {
-    if (accounts.length > 0) {
-    setwalletAccount(accounts[0])
-    }
-  }
+
+   /* ikkada em transactions chesina adhi old signer vey untaai so,
+    adnkuey ikkada new instance with new signer  
+              */
+    const handleChange = async (accounts) => {
+      if (accounts.length > 0) {
+        setwalletAccount(accounts[0]);
+        // Re-initialize contracts with new signer
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const newContract = new ethers.Contract(ecoLedgerAddress, EcoLedgerAbi, signer);
+        const newToken = new ethers.Contract(sustainabilityCoinAddress, sustainabilityCoinAbi, signer);
+        setContract(newContract);
+        setTokenInstance(newToken);
+      }
+    };
+  
 
   
   const fetchProjects =  async () => {
@@ -460,7 +472,10 @@ const [result1, result2, result3] = await Promise.all([
         </Route>
         <Route path='/contibuteToTheProject' element={<ContributeToTheProject
          contract={contract} TokenInstance={TokenInstance}
+         setTokenInstance={setTokenInstance}
        walletAccount={walletAccount}
+       sustainabilityCoinAddress ={sustainabilityCoinAddress} 
+       sustainabilityCoinAbi={sustainabilityCoinAbi}
          />}>
 
         </Route>

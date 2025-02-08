@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "hardhat/console.sol";
 
 contract SustainabilityCoin is ERC20 {
     // Add owner variable if you want to restrict minting
@@ -22,6 +23,7 @@ contract SustainabilityCoin is ERC20 {
 
     // Optional: Add a mint function if you want to mint more tokens later
     function mint(address to,uint256 amount) public onlyOwner {
+        console.log("msg.sender from coin",msg.sender);
         _mint(to, amount);
     }
 

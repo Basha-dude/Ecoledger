@@ -4,12 +4,13 @@ import { ethers } from "ethers";
 
 
 
-const ContributeToTheProject = ({contract,TokenInstance,walletAccount}) => {
+const ContributeToTheProject = ({contract,TokenInstance,setTokenInstance,walletAccount,sustainabilityCoinAddress,sustainabilityCoinAbi}) => {
     const [amount, setAmount] = useState(''); 
     const [coinAmount, setcoinAmount] = useState("")
     const [totalContributions, settotalContributions] = useState("")
     const [contractBalance, setcontractBalance] = useState("")
     const [tokenBalanceOfUser, settokenBalanceOfUser] = useState("")
+    
     const Contribute = async () => {
         console.log("amount", amount);
     
@@ -44,7 +45,6 @@ const ContributeToTheProject = ({contract,TokenInstance,walletAccount}) => {
         try {
             const CoinPrice = await contract.priceOfSustainabilityCoin(coinAmount)
             console.log("CoinPrice",CoinPrice);
-            
             const buyTx = await contract.buySustainabilityCoin(coinAmount,{value:CoinPrice})
             await buyTx.wait()
           alert("Coin Contribution successful");
@@ -93,8 +93,8 @@ const ContributeToTheProject = ({contract,TokenInstance,walletAccount}) => {
           console.log("TokenInstance is not available.");
           return;
         }
-          const provider  = new ethers.BrowserProvider(window.ethereum)
-           const signer = await provider.getSigner()
+        const provider  = new ethers.BrowserProvider(window.ethereum)
+        const signer = await provider.getSigner()
         const tokenBalance = await TokenInstance.balanceOf(signer.address)
         settokenBalanceOfUser(tokenBalance)
       }

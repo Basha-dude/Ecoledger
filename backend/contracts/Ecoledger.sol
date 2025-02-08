@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 import {ISustainabilityCoin} from "./interfaces/ISustainabilityCoin.sol";    
 import {UUPSUpgradeable,Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -70,10 +70,12 @@ ISustainabilityCoin public  sustainabilityToken;
         __Ownable_init(msg.sender);  
         __UUPSUpgradeable_init();     
         sustainabilityToken = ISustainabilityCoin(tokenAddress);
+
         maxAnnualEmissions = 10_000;
         maxAnnualWaterUsage = 100_000;
         withdrawalPercentage = 2;  
         insurancePercentage = 10;
+    
     }
 
     
@@ -247,6 +249,7 @@ ISustainabilityCoin public  sustainabilityToken;
         require(msg.value >= toPay, "Insufficient payment");   
         contributions[msg.sender] += toPay;
         totalContributions += toPay;
+        console.log(msg.sender);
         ISustainabilityCoin(sustainabilityToken).mint(msg.sender,amount);     
     }
     function contributeTosayNoCarbon(uint256 amount) public payable {

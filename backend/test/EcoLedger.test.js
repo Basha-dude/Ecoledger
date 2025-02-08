@@ -180,6 +180,14 @@ describe("PAY FOR CARBON + VALIDATED PROJECT FUNCTION", function () {
     await expect(ecoLedger.payForCarbon(1,{value: 0 })
     ).to.be.revertedWith("Insufficient payment.");  
   });
+  it("should give msg.sender carbon", async function () {
+    const toPay  =  await ecoLedger.buySustainabilityCoin(10,{value:ethers.parseEther("1")})
+    console.log("owner",owner.address);
+    console.log("ecoLedger.target",ecoLedger.target);
+    console.log("sustainabilityToken.target",sustainabilityToken.target);
+
+    
+});
 
 
 });
