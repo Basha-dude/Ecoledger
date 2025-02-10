@@ -15,6 +15,7 @@ import  Inusrance  from "./components/Inusrance";
 import ClaimInsurance from "./components/ClaimInsurance";
 import InsurancedClaimed from "./components/InsurancedClaimed";
 import ContributeToTheProject from './components/ContributeToTheProject';
+import "./App.css"
 
 
 /* double logging happens because of react strictmode,

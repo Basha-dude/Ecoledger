@@ -1,38 +1,161 @@
-.App {
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+h1 {
   text-align: center;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  color: #2d3748;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Container Styles */
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.form-group {
+  margin-bottom: 15px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+label {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin-bottom: 5px;
+  display: block;
+}
+
+input[type="text"], 
+input[type="number"], 
+input[type="checkbox"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin-top: 5px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+}
+
+/* Updated Button Styles */
+button {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 4px;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+  background-color: #3182ce;
+  transform: translateY(-1px);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+}
+
+/* Specific Section Buttons */
+.contribute-section button,
+.buy-coin-section button,
+.withdraw-section button {
+  width: auto;
+  min-width: 100px;
+  margin-top: 12px;
+  padding: 6px 14px;
+}
+
+/* Balance Display Styles */
+.balance-section {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+}
+
+.balance-section p {
+  font-size: 0.9rem;
+  margin: 8px 0;
+}
+
+.balance-section strong {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+/* Form Sections */
+.contribute-section, 
+.buy-coin-section, 
+.withdraw-section {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 15px;
   }
-  to {
-    transform: rotate(360deg);
+
+  button {
+    width: 100%;
   }
+}
+
+/* Utility Classes */
+.flex-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.text-sm {
+  font-size: 0.85rem;
+}
+
+.mt-3 {
+  margin-top: 1rem;
 }
