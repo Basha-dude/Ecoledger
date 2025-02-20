@@ -22,7 +22,10 @@ import "./App.css"
  the strict mode calls the useEffect twice, because of that loggin twice
   */ 
 
-// completed   to buy the coins and displaying on dom
+// ERROR OR NOTE:-there are some errors which are related to the wallets Especially for the 
+// coinwallet and trust wallet
+
+
 
    /** 
    
